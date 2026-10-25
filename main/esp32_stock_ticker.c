@@ -27,6 +27,7 @@ static const char *TAG = "main";
 
 void app_main(void)
 {
+    ESP_LOGI(TAG, "Flash Successful!");
     // ESP_LOGI(TAG, "Connecting to WIFI");
     // wifi_connect();
 
