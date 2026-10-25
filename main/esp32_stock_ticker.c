@@ -2,7 +2,7 @@
 
 //wifi driver
 #include "esp_log.h"
-// #include "wifi_sta.h"
+#include "wifi_sta.h"
 // #include "display_init.h"
 
 static const char *TAG = "main";
@@ -27,8 +27,9 @@ static const char *TAG = "main";
 
 void app_main(void)
 {
-    // ESP_LOGI(TAG, "Connecting to WIFI");
-    // wifi_connect();
+    ESP_LOGI(TAG, "Flash Successful!");
+    ESP_LOGI(TAG, "Connecting to WIFI");
+    wifi_connect();
 
     // esp_lcd_panel_handle_t panel;
     // display_init(&panel);
