@@ -10,7 +10,7 @@
 
 #define WIFI_SSID   "URHome"
 #define WIFI_PASS   "lingN94AU5g18374"
-#define MAX_RETRIES 5
+#define MAX_RETRIES 10
 
 // Tag shown in front of log messages from this file (e.g. "I (1234) wifi: ...")
 static const char *WIFI_TAG = "wifi";

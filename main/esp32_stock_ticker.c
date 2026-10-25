@@ -7,15 +7,6 @@
 
 static const char *TAG = "main";
 
-// static void fetch_task(void *arg)
-// {
-//     if (http_get("https://httpbin.org/get")) {
-//         ESP_LOGI(TAG, "\nBody: %s", s_body);
-//         parse_response();
-//     }
-//     vTaskDelete(NULL);
-// }
-
 // static void fill_rect(esp_lcd_panel_handle_t panel, int x, int y, int w, int h, uint16_t color)
 // {
 //     static uint16_t row[480];                    // big enough for either axis
@@ -31,9 +22,8 @@ void app_main(void)
     ESP_LOGI(TAG, "Connecting to WIFI");
     wifi_connect();
 
-    // esp_lcd_panel_handle_t panel;
-    // display_init(&panel);
-    // xTaskCreate(fetch_task, "fetch", 8192, NULL, 5, NULL);
+    esp_lcd_panel_handle_t panel;
+    display_init(&panel);
 
     // // in app_main, after display_init(&panel):
     // fill_rect(panel, 0, 0, 320, 480, 0x0000);        // black background
