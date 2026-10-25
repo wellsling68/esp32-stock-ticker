@@ -50,3 +50,12 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# ESP-IDF Specific Build Files:
+build/
+managed_components/
+
+sdkconfig
+sdkconfig.old
+
+*.log
