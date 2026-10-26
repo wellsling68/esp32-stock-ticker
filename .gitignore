@@ -63,3 +63,4 @@ sdkconfig.old
 # VS Code Workspace Config
 *.code-workspace
 /.vscode
+components/api_fetch/include/api_secrets.h
