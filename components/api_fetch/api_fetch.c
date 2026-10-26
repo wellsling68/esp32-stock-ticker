@@ -1,4 +1,5 @@
 #include "api_fetch.h"
+#include "api_secrets.h"
 #include <stdio.h>
 #include <string.h>
 #include "esp_http_client.h"
@@ -8,7 +9,6 @@
 
 static const char *TAG = "finnhub";
 #define RESP_BUF_SIZE 1024
-#define CONFIG_FINNHUB_API_KEY "your_key_here"
 
 typedef struct {
     char buf[RESP_BUF_SIZE];
