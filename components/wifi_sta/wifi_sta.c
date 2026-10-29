@@ -8,8 +8,6 @@
 #include "esp_netif.h"
 #include "nvs_flash.h"
 
-#define WIFI_SSID   "URHome"
-#define WIFI_PASS   "lingN94AU5g18374"
 #define MAX_RETRIES 10
 
 // Tag shown in front of log messages from this file (e.g. "I (1234) wifi: ...")

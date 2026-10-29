@@ -63,4 +63,5 @@ sdkconfig.old
 # VS Code Workspace Config
 *.code-workspace
 /.vscode
+components/wifi_sta/include/wifi_secrets.h
 components/api_fetch/include/api_secrets.h
