@@ -35,6 +35,8 @@ esp_err_t finnhub_get_quote(const char *symbol, finnhub_quote_t *out)
 {
     resp_t resp = { .len = 0 };
     char url[160];
+
+    //make sure CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_CROSS_SIGNED_VERIFY is turned ON
     snprintf(url, sizeof(url),
              "https://finnhub.io/api/v1/quote?symbol=%s&token=%s",
              symbol, CONFIG_FINNHUB_API_KEY);
