@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "lvgl.h"
+#include "ui.h"
 #include "display_init.h"
 #include "esp_lvgl_port.h"
 
