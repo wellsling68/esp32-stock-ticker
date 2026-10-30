@@ -2,7 +2,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-//wifi driver
 #include "esp_log.h"
 #include "wifi_sta.h"
 #include "display_init.h"
@@ -21,6 +20,20 @@ static void fill_rect(esp_lcd_panel_handle_t panel, int x, int y, int w, int h, 
 
 void finnhub_fetch(void *arg)
 {
+    /* Reference:
+     *
+     *  typedef struct {
+     *      float current;        // c
+     *      float change;         // d
+     *      float percent_change; // dp
+     *      float high;           // h
+     *      float low;            // l
+     *      float open;           // o
+     *      float prev_close;     // pc
+     *      uint32_t timestamp;   // t
+     *  } finnhub_quote_t;
+    */
+
     finnhub_quote_t q;
     while (1) {
         if (finnhub_get_quote("AAPL", &q) == ESP_OK) {
@@ -38,12 +51,13 @@ void app_main(void)
 
     esp_lcd_panel_handle_t panel;
     display_init(&panel);
+    ESP_LOGI(TAG, "Display Initialized");
+
+    xTaskCreate(finnhub_fetch, "ticker", 8192, NULL, 5, NULL);
 
     // in app_main, after display_init(&panel):
     fill_rect(panel, 0, 0, 320, 480, 0x0000);        // black background
     fill_rect(panel, 0,   0,   80, 80, 0xFFFF);      // BIG square at x=0,   y=0
     fill_rect(panel, 280, 0,   40, 40, 0xFFFF);      // MEDIUM square at x=280, y=0
-    fill_rect(panel, 0,   440, 20, 40, 0xFFFF);      // TALL thin rectangle at x=0, y=440
-
-    xTaskCreate(finnhub_fetch, "ticker", 8192, NULL, 5, NULL);
+    fill_rect(panel, 0,   440, 20, 40, 0xFFFF);      // TALL thin rectangle at x=0, y=440    
 }
