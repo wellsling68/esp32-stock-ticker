@@ -1,5 +1,5 @@
-#include "wifi_sta.h"
-#include "wifi_secrets.h"
+#include "wifi-sta.h"
+#include "wifi-secrets.h"
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
