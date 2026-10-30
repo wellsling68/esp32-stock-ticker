@@ -4,7 +4,7 @@
 
 #include "esp_log.h"
 #include "wifi_sta.h"
-#include "display_init.h"
+#include "display.h"
 #include "api_fetch.h"
 
 static const char *TAG = "main";

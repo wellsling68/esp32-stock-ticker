@@ -47,6 +47,6 @@ direct_dependencies:
 - espressif/cjson
 - espressif/esp_lcd_st7796
 - idf
-manifest_hash: dd938045158e691a7173712ca37fa64a5fb08b279da4aafedb416de73fff991b
+manifest_hash: 80aed15f78cf2a99bc99fb786813daa09f0c39b57e59bb7b51c181e3aa3db091
 target: esp32
 version: 3.0.0
