@@ -1,4 +1,4 @@
-#include "display_init.h"
+#include "display.h"
 #include "driver/spi_master.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_st7796.h"
