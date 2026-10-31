@@ -4,11 +4,19 @@
 #include "display.h"
 #include "esp_lvgl_port.h"
 
+// static lv_obj_t *s_symbol_label;
+// static lv_obj_t *s_price_label;
+// static lv_obj_t *s_change_label;
 
+static lv_obj_t *s_symbol, *s_price, *s_change;
 
-static lv_obj_t *s_symbol_label;
-static lv_obj_t *s_price_label;
-static lv_obj_t *s_change_label;
+static lv_obj_t *make_label(lv_obj_t *parent, const lv_font_t *font)
+{
+    lv_obj_t *l = lv_label_create(parent);
+    lv_obj_set_style_text_font(l, font, 0);
+    lv_obj_set_style_text_color(l, lv_color_white(), 0);
+    return l;
+}
 
 esp_err_t lvgl_init(void)
 {
@@ -42,12 +50,30 @@ esp_err_t lvgl_init(void)
     //writing to display
     if (lvgl_port_lock(0)) {
         lv_obj_t *scr = lv_screen_active();
-        s_symbol_label = lv_label_create(scr);
-        lv_obj_align(s_symbol_label, LV_ALIGN_TOP_MID, 0, 40);
-        s_price_label = lv_label_create(scr);
-        lv_obj_align(s_price_label, LV_ALIGN_CENTER, 0, 0);
-        s_change_label = lv_label_create(scr);
-        lv_obj_align(s_change_label, LV_ALIGN_CENTER, 0, 40);
+        // s_symbol_label = lv_label_create(scr);
+        // lv_obj_align(s_symbol_label, LV_ALIGN_TOP_MID, 0, 40);
+        // s_price_label = lv_label_create(scr);
+        // lv_obj_align(s_price_label, LV_ALIGN_CENTER, 0, 0);
+        // s_change_label = lv_label_create(scr);
+        // lv_obj_align(s_change_label, LV_ALIGN_CENTER, 0, 40);
+        
+        lv_obj_set_style_bg_color(scr, lv_color_hex(0x13151A), 0);
+
+        lv_obj_t *row = lv_obj_create(scr);
+        lv_obj_set_size(row, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+        lv_obj_set_style_bg_opa(row, LV_OPA_TRANSP, 0);
+        lv_obj_set_style_border_width(row, 0, 0);
+        lv_obj_set_style_pad_all(row, 0, 0);
+        lv_obj_set_style_pad_column(row, 12, 0);
+        lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+        lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START,
+                              LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+        lv_obj_align(row, LV_ALIGN_TOP_LEFT, 10, 10);
+
+        s_symbol = make_label(row, &lv_font_montserrat_28);
+        s_price  = make_label(row, &lv_font_montserrat_28);
+        s_change = make_label(row, &lv_font_montserrat_20);
+
 
         // --- temporary: corner orientation test ---
         static const struct { lv_align_t align; uint32_t color; } corners[] = {
@@ -71,16 +97,16 @@ esp_err_t lvgl_init(void)
 
 void ui_show_quote(const char *symbol, float price, float change_pct)
 {
-    char price_buf[16], change_buf[16];
-    snprintf(price_buf, sizeof(price_buf), "%.2f", price);
-    snprintf(change_buf, sizeof(change_buf), "%+.2f%%", change_pct);
+    char p[16], c[16];
+    snprintf(p, sizeof(p), "%.2f", price);
+    snprintf(c, sizeof(c), "%+.2f%%", change_pct);
 
     if (lvgl_port_lock(0)) {
-        lv_label_set_text(s_symbol_label, symbol);
-        lv_label_set_text(s_price_label, price_buf);
-        lv_label_set_text(s_change_label, change_buf);
-        lv_obj_set_style_text_color(s_change_label,
-            change_pct >= 0 ? lv_color_hex(0x00C853) : lv_color_hex(0xD50000), 0);
+        lv_label_set_text(s_symbol, symbol);
+        lv_label_set_text(s_price, p);
+        lv_label_set_text(s_change, c);
+        lv_obj_set_style_text_color(s_change,
+            change_pct >= 0 ? lv_color_hex(0x2ECC71) : lv_color_hex(0xFF4D4F), 0);
         lvgl_port_unlock();
     }
 }
