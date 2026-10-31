@@ -7,6 +7,7 @@
 // #include "display.h"
 #include "api-fetch.h"
 #include "ui.h"
+#include "input.h"
 
 static const char *TAG = "main";
 
@@ -65,4 +66,10 @@ void app_main(void)
     // fill_rect(panel, 0,   0,   80, 80, 0xFFFF);      // BIG square at x=0,   y=0
     // fill_rect(panel, 280, 0,   40, 40, 0xFFFF);      // MEDIUM square at x=280, y=0
     // fill_rect(panel, 0,   440, 20, 40, 0xFFFF);      // TALL thin rectangle at x=0, y=440    
+    QueueHandle_t q = input_init();
+    input_evt_t e;
+    while (xQueueReceive(q, &e, portMAX_DELAY)) {
+        ESP_LOGI("main", "event: %s",
+                e == INPUT_EVT_CW ? "CW" : e == INPUT_EVT_CCW ? "CCW" : "PRESS");
+    }
 }
