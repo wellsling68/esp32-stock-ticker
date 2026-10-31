@@ -10,7 +10,7 @@
 #define PIN_DC     2
 #define PIN_RST    4
 
-esp_err_t display_init(esp_lcd_panel_handle_t *out_panel)
+esp_err_t display_init(esp_lcd_panel_io_handle_t *out_io, esp_lcd_panel_handle_t *out_panel)
 {
     spi_bus_config_t buscfg = {
         .mosi_io_num = PIN_MOSI, .miso_io_num = -1, .sclk_io_num = PIN_SCLK,
@@ -31,15 +31,18 @@ esp_err_t display_init(esp_lcd_panel_handle_t *out_panel)
     esp_lcd_panel_handle_t panel = NULL;
     esp_lcd_panel_dev_config_t panel_cfg = {
         .reset_gpio_num = PIN_RST,
-        .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
+        .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
         .bits_per_pixel = 16,
     };
     ESP_ERROR_CHECK(esp_lcd_new_panel_st7796(io, &panel_cfg, &panel));
 
     esp_lcd_panel_reset(panel);
     esp_lcd_panel_init(panel);
+    esp_lcd_panel_swap_xy(panel, DISPLAY_SWAP_XY);
+    // esp_lcd_panel_mirror(panel, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y);
     esp_lcd_panel_disp_on_off(panel, true);
 
+    *out_io = io;
     *out_panel = panel;
     return ESP_OK;
 }
