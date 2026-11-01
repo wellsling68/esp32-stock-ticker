@@ -60,7 +60,8 @@ static void input_task(void *arg)
             btn_count = 0;
         }
 
-        vTaskDelay(pdMS_TO_TICKS(POLL_MS));
+        TickType_t d = pdMS_TO_TICKS(POLL_MS);
+        vTaskDelay(d ? d : 1);
     }
 }
 
