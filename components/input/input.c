@@ -8,9 +8,12 @@
 
 #define POLL_MS       1
 #define BTN_DEBOUNCE  20   // consecutive samples (ms) before accepting a change
+#define LONG_PRESS_MS 600
 
 static const char *TAG = "input";
 static QueueHandle_t s_queue;
+TickType_t press_tick = 0;
+bool long_sent = false;
 
 // index = (prev_state << 2) | curr_state, state = (A << 1) | B
 // invalid/bounce transitions map to 0
@@ -52,12 +55,21 @@ static void input_task(void *arg)
                 btn_stable = btn;
                 btn_count = 0;
                 if (btn_stable == 0) {
+                    press_tick = xTaskGetTickCount();
+                    long_sent = false;
+                } else if (!long_sent) {
                     input_evt_t e = INPUT_EVT_PRESS;
                     xQueueSend(s_queue, &e, 0);
                 }
             }
         } else {
             btn_count = 0;
+            if (btn_stable == 0 && !long_sent &&
+                (xTaskGetTickCount() - press_tick) >= pdMS_TO_TICKS(LONG_PRESS_MS)) {
+                long_sent = true;
+                input_evt_t e = INPUT_EVT_LONG;
+                xQueueSend(s_queue, &e, 0);
+            }
         }
 
         TickType_t d = pdMS_TO_TICKS(POLL_MS);
