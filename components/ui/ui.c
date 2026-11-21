@@ -110,3 +110,19 @@ void ui_show_quote(const char *symbol, float price, float change_pct)
         lvgl_port_unlock();
     }
 }
+
+void ui_show_list(const char *const *symbols, const float *price, const float *pct,
+                  const bool *valid, size_t count, size_t selected)
+{
+    ESP_LOGI("ui", "LIST (selected=%d)", (int)selected);
+    for (size_t i = 0; i < count; i++) {
+        if (valid[i]) ESP_LOGI("ui", "  %s%s $%.2f (%.2f%%)", i == selected ? ">" : " ",
+                               symbols[i], price[i], pct[i]);
+        else          ESP_LOGI("ui", "  %s%s --", i == selected ? ">" : " ", symbols[i]);
+    }
+}
+
+void ui_show_error(const char *msg)
+{
+    ESP_LOGI("ui", "ERROR: %s", msg);
+}
