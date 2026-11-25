@@ -10,7 +10,8 @@
 #include "ui.h"
 #include "input.h"
 
-static const char *SYMBOLS[] = { "META", "AAPL", "PLTR", "TSM", "GOOG", "NVDA" };
+static const char *SYMBOLS[] = { "META", "AAPL", "PLTR", "TSM", "PLBL", "NVDA" };
+static const char *NAMES[] = { "Meta Platforms", "Apple Inc.", "Palantir", "TSMC", "<PLBL name>", "NVIDIA" };
 #define NUM_SYMBOLS        (sizeof(SYMBOLS) / sizeof(SYMBOLS[0]))
 
 #define DETAIL_REFRESH_MS  2000   // expanded view
@@ -47,20 +48,15 @@ static void redraw(void)
 
     switch (s_screen) {
         case SCREEN_LIST:
-            float price[NUM_SYMBOLS], pct[NUM_SYMBOLS];
             snapshot(q, v);
-            for (size_t i = 0; i < NUM_SYMBOLS; i++) {
-                price[i] = q[i].current;
-                pct[i]   = q[i].percent_change;
-            }
-            ui_show_list(SYMBOLS, price, pct, v, NUM_SYMBOLS, s_sel);
+            ui_show_list(SYMBOLS, NAMES, q, v, NUM_SYMBOLS, s_sel);
             break;
         case SCREEN_DETAIL:
             snapshot(q, v);
-            if (v[s_sel]) ui_show_quote(SYMBOLS[s_sel], q[s_sel].current, q[s_sel].percent_change);
+            // if (v[s_sel]) ui_show_quote(SYMBOLS[s_sel], q[s_sel].current, q[s_sel].change);
             break;
         case SCREEN_ERROR:
-            ui_show_error("WiFi or API failure - retrying");
+            // ui_show_error("WiFi or API failure - retrying");
             break;
     }
 }
@@ -240,7 +236,7 @@ void finnhub_fetch(void *arg)
     while (1) {
         if (finnhub_get_quote("AAPL", &q) == ESP_OK) {
             ESP_LOGI("main", "AAPL $%.2f (%.2f%%)", q.current, q.percent_change);
-            ui_show_quote("AAPL", q.current, q.percent_change);
+            ui_show_quote("AAPL", q.current, q.change);
         }
         vTaskDelay(pdMS_TO_TICKS(2000));
     }

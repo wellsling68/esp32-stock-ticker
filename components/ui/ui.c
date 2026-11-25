@@ -1,23 +1,24 @@
+// typedef struct {
+//     float current;        // c
+//     float change;         // d
+//     float percent_change; // dp
+//     float high;           // h
+//     float low;            // l
+//     float open;           // o
+//     float prev_close;     // pc
+//     uint32_t timestamp;   // t
+// } finnhub_quote_t;
+
 #include <stdio.h>
 #include <string.h>
 #include "ui.h"
+#include "ui-quote-list.h"
 #include "display.h"
 #include "esp_lvgl_port.h"
 
-// static lv_obj_t *s_symbol_label;
-// static lv_obj_t *s_price_label;
-// static lv_obj_t *s_change_label;
+lv_obj_t *scr_list, *scr_detail, *scr_error;
 
-static lv_obj_t *s_symbol, *s_price, *s_change;
-
-static lv_obj_t *make_label(lv_obj_t *parent, const lv_font_t *font)
-{
-    lv_obj_t *l = lv_label_create(parent);
-    lv_obj_set_style_text_font(l, font, 0);
-    lv_obj_set_style_text_color(l, lv_color_white(), 0);
-    return l;
-}
-
+//static void make_detailed_quote
 esp_err_t lvgl_init(void)
 {
     // connection to display
@@ -49,45 +50,33 @@ esp_err_t lvgl_init(void)
 
     //writing to display
     if (lvgl_port_lock(0)) {
-        lv_obj_t *scr = lv_screen_active();
-        // s_symbol_label = lv_label_create(scr);
-        // lv_obj_align(s_symbol_label, LV_ALIGN_TOP_MID, 0, 40);
-        // s_price_label = lv_label_create(scr);
-        // lv_obj_align(s_price_label, LV_ALIGN_CENTER, 0, 0);
-        // s_change_label = lv_label_create(scr);
-        // lv_obj_align(s_change_label, LV_ALIGN_CENTER, 0, 40);
-        
-        lv_obj_set_style_bg_color(scr, lv_color_hex(0x13151A), 0);
+        scr_list = lv_screen_active();
+        quote_list_create(scr_list);
 
-        lv_obj_t *row = lv_obj_create(scr);
-        lv_obj_set_size(row, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-        lv_obj_set_style_bg_opa(row, LV_OPA_TRANSP, 0);
-        lv_obj_set_style_border_width(row, 0, 0);
-        lv_obj_set_style_pad_all(row, 0, 0);
-        lv_obj_set_style_pad_column(row, 12, 0);
-        lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
-        lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START,
-                              LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-        lv_obj_align(row, LV_ALIGN_TOP_LEFT, 10, 10);
+        // scr_detail = lv_obj_create(NULL);
+        // lv_obj_set_style_bg_color(scr_detail, lv_color_hex(0x13151A), 0);
+        // lv_obj_set_style_pad_all(scr_detail, 8, 0);
+        // make_list_item(scr_detail, &detail_quote);
 
-        s_symbol = make_label(row, &lv_font_montserrat_28);
-        s_price  = make_label(row, &lv_font_montserrat_28);
-        s_change = make_label(row, &lv_font_montserrat_20);
 
+        // scr_error = lv_obj_create(NULL);    // NULL parent = a new screen
+        // lv_obj_set_style_bg_color(scr_error, lv_color_hex(0x13151A), 0);
+        // err_label = make_label(scr_error, &lv_font_montserrat_20);
+        // lv_obj_center(err_label);
 
         // --- temporary: corner orientation test ---
-        static const struct { lv_align_t align; uint32_t color; } corners[] = {
-            { LV_ALIGN_TOP_LEFT,     0xFFFF00 },  // yellow
-            { LV_ALIGN_TOP_RIGHT,    0x00FFFF },  // cyan
-            { LV_ALIGN_BOTTOM_LEFT,  0xFF00FF },  // magenta  
-            { LV_ALIGN_BOTTOM_RIGHT, 0xFFFFFF },  // white
-        };
-        for (int i = 0; i < 4; i++) {
-            lv_obj_t *sq = lv_obj_create(scr);
-            lv_obj_set_size(sq, 20, 20);
-            lv_obj_set_style_bg_color(sq, lv_color_hex(corners[i].color), 0);
-            lv_obj_align(sq, corners[i].align, 0, 0);
-        }
+        // static const struct { lv_align_t align; uint32_t color; } corners[] = {
+        //     { LV_ALIGN_TOP_LEFT,     0xFFFF00 },  // yellow
+        //     { LV_ALIGN_TOP_RIGHT,    0x00FFFF },  // cyan
+        //     { LV_ALIGN_BOTTOM_LEFT,  0xFF00FF },  // magenta  
+        //     { LV_ALIGN_BOTTOM_RIGHT, 0xFFFFFF },  // white
+        // };
+        // for (int i = 0; i < 4; i++) {
+        //     lv_obj_t *sq = lv_obj_create(NULL);
+        //     lv_obj_set_size(sq, 20, 20);
+        //     lv_obj_set_style_bg_color(sq, lv_color_hex(corners[i].color), 0);
+        //     lv_obj_align(sq, corners[i].align, 0, 0);
+        // }
         // --- end test ---
 
         lvgl_port_unlock();
@@ -95,34 +84,40 @@ esp_err_t lvgl_init(void)
     return ESP_OK;
 }
 
-void ui_show_quote(const char *symbol, float price, float change_pct)
-{
-    char p[16], c[16];
-    snprintf(p, sizeof(p), "%.2f", price);
-    snprintf(c, sizeof(c), "%+.2f%%", change_pct);
+// void ui_show_quote(const char *symbol, float price, float chg)
+// {
+//     char p[16], c[16];
+//     snprintf(p, sizeof(p), "%.2f", price);
+//     snprintf(c, sizeof(c), "%+.2f", chg);
 
-    if (lvgl_port_lock(0)) {
-        lv_label_set_text(s_symbol, symbol);
-        lv_label_set_text(s_price, p);
-        lv_label_set_text(s_change, c);
-        lv_obj_set_style_text_color(s_change,
-            change_pct >= 0 ? lv_color_hex(0x2ECC71) : lv_color_hex(0xFF4D4F), 0);
-        lvgl_port_unlock();
-    }
+//     if (lvgl_port_lock(0)) {
+//         lv_label_set_text(detail_quote.sym, symbol);
+//         lv_label_set_text(detail_quote.price, p);
+//         lv_label_set_text(detail_quote.pct, c);
+//         lv_obj_set_style_text_color(detail_quote.pct,
+//             chg >= 0 ? lv_color_hex(0x2ECC71) : lv_color_hex(0xFF4D4F), 0);
+        
+//         if (lv_screen_active() != scr_detail) lv_screen_load(scr_detail);
+//         lvgl_port_unlock();
+//     }
+// }
+
+void ui_show_list(const char *const *symbols, const char *const *names,
+                  const finnhub_quote_t *q, const bool *valid,
+                  size_t count, size_t selected)
+{
+    if (!lvgl_port_lock(0)) return;
+    quote_list_update(symbols, names, q, valid, count, selected);
+    if (lv_screen_active() != scr_list) lv_screen_load(scr_list);
+    lvgl_port_unlock();
 }
 
-void ui_show_list(const char *const *symbols, const float *price, const float *pct,
-                  const bool *valid, size_t count, size_t selected)
-{
-    ESP_LOGI("ui", "LIST (selected=%d)", (int)selected);
-    for (size_t i = 0; i < count; i++) {
-        if (valid[i]) ESP_LOGI("ui", "  %s%s $%.2f (%.2f%%)", i == selected ? ">" : " ",
-                               symbols[i], price[i], pct[i]);
-        else          ESP_LOGI("ui", "  %s%s --", i == selected ? ">" : " ", symbols[i]);
-    }
-}
-
-void ui_show_error(const char *msg)
-{
-    ESP_LOGI("ui", "ERROR: %s", msg);
-}
+// void ui_show_error(const char *msg)
+// {
+//     ESP_LOGI("ui", "ERROR: %s", msg);
+//     if (lvgl_port_lock(0)) {
+//         lv_label_set_text(err_label, msg);
+//         lv_screen_load(scr_error);
+//         lvgl_port_unlock();
+//     }
+// }
